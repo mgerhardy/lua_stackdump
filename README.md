@@ -7,7 +7,7 @@ There are still a few TODOs in the code - pull requests are welcome
 Public Domain
 
 Example output:
-``
+```
 --------------------start-of-stacktrace----------------
 index | details (4 entries)
 -1    | [string ""]:10: attempt to concatenate a nil value (local 'deltaMillis') (string)
@@ -25,4 +25,4 @@ index | details (4 entries)
            \-- execute (string) = function [0x7d0c00000c60]
        \-- execute (string) = function [0x7d0c00000c60]
 ----------------------end-of-stacktrace----------------
-``
+```

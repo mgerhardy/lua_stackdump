@@ -3,6 +3,11 @@
  * @brief Small helper function for LUA to print stack traces from C
  * @copyright Martin Gerhardy (http://github.com/mgerhardy)
  *
+ * @note
+ * to create the implementation,
+ *     #define LUASD_IMPLEMENTATION
+ * in *one* C/CPP file that includes this file.
+ *
  * @par License
  * Public domain
  *
@@ -13,12 +18,6 @@
 #ifndef LUA_STACKDUMP_H
 #define LUA_STACKDUMP_H
 
-extern "C" {
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-}
-
 #ifndef luaSD_MAXDEPTH
 #define luaSD_MAXDEPTH 2
 #endif
@@ -28,8 +27,28 @@ extern "C" {
 #define luaSD_PRINT printf
 #endif
 
+#ifndef LUASD_API
+#define LUASD_API
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
+
 typedef int (*luaSD_printf) (const char *__restrict __format, ...);
 
+extern void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf);
+extern void luaSD_stackdump_default (lua_State* state);
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef LUASD_IMPLEMENTATION
 static void luaSD_stackdumpvalue (lua_State* state, luaSD_printf luasdorintf, int stackIndex, int depth, int newline, int indentLevel, int performIndent) {
 	int t;
 	/* ensure that the value is on the top of the stack */
@@ -180,7 +199,7 @@ static void luaSD_stackdumpvalue (lua_State* state, luaSD_printf luasdorintf, in
 	lua_pop(state, 2);
 }
 
-inline void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf) {
+LUASD_API void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf) {
 	const int top = lua_gettop(state);
 	luasdprintf("\n--------------------start-of-stacktrace----------------\n");
 	luasdprintf("index | details (%i entries)\n", top);
@@ -191,9 +210,10 @@ inline void luaSD_stackdump (lua_State* state, luaSD_printf luasdprintf) {
 	luasdprintf("----------------------end-of-stacktrace----------------\n\n");
 }
 
-inline void luaSD_stackdump_default (lua_State* state) {
+LUASD_API void luaSD_stackdump_default (lua_State* state) {
 	luaSD_stackdump(state, luaSD_PRINT);
 }
+#endif
 
 #endif
 
